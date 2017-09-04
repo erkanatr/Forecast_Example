@@ -97,8 +97,7 @@ multiple_forecasts <- function(df_current_train, df_current_test) {
 
 create_forecast <- function(train_df, test_df, func, func_args = list()) {
   ts_train <- train_df %>%
-    df_to_ts("y") %>%
-    tsclean()
+    df_to_ts("y") 
   
   ts_test <- test_df %>%
     df_to_ts("y")
@@ -175,10 +174,10 @@ forecast_prophet <- function(df_train, growth)
   model <- prophet(df_train, growth = growth)
   
   if(growth == "logistic") {
-    future <- make_future_dataframe(model, periods = 12, freq = "m") %>%
+    future <- make_future_dataframe(model, periods = 29, freq = "m") %>%
       mutate(cap = cap)
   } else {
-    future <- make_future_dataframe(model, periods = 12, freq = "m") 
+    future <- make_future_dataframe(model, periods = 29, freq = "m") 
   }
   
   forecast <- predict(model, future) %>%
