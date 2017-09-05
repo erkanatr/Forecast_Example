@@ -49,9 +49,9 @@ multiple_forecasts <- function(df_current_train, df_current_test) {
   # -- Create all Forecasts from forecast package
   current_results <- df_current_test %>%
     # -- Holt Winters with additive seasonal component --
-    bind_cols(., create_forecast(df_current_train, df_current_test, "hw", 
-                             list(seasonal = "additive", 
-                             initial = "optimal"))) %>%
+    #bind_cols(., create_forecast(df_current_train, df_current_test, "hw", 
+    #                         list(seasonal = "additive", 
+    #                         initial = "optimal"))) %>%
     # -- Auto.Arima -- 
     bind_cols(., create_forecast(df_current_train, df_current_test, 
                              "auto.arima")) %>%
@@ -145,7 +145,7 @@ forecast_ensemble <- function(current_results) {
   mix <- mixture(Y = test_data_ts, experts = experts, model = "OGD", 
                  loss.type = "percentage")
   p_mix <- ts(predict(mix, experts, test_data_ts, type='response'), 
-              start = c(2015, 07), frequency = 29)
+              start = c(2015, 07), frequency = 12)
   
   
   ensemble_result <- as_tibble(p_mix) %>%

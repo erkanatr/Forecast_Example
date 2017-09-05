@@ -21,6 +21,12 @@ set.seed(10) # set random seed for reproducible results
 
 source("Code/func_forecasts.R")
 
+START_TRAIN <- as.Date("2012-01-01") # Start der Trainingsdaten
+END_TRAIN <- as.Date("2015-06-01") # die letzten Daten im Trainingsdatensatz
+START_TEST <- as.Date("2015-07-01") # Start des Testzeitraums
+END_TEST <- as.Date("2016-06-01") # Ende des Testzeitraumes
+
+
 # -- load data
 data("AirPassengers")
 df_data <- AirPassengers %>%
@@ -52,7 +58,7 @@ ggplot(df_data, aes(x = Monat, y = y, color = dataset)) +
   geom_line() +
   geom_point()
 
-multiple_forecasts(df_train, df_test)
+forecasts <- multiple_forecasts(df_train, df_test)
 
 
 
