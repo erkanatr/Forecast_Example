@@ -72,46 +72,29 @@ abs_error <- function(y_hat, y) {
 
 # -- function for calculating rmse
 calc_metrics <- function(results, name, func) {
-  articles <- unique(results$Artikel)
-  orte <- unique(results$Ort)
   name <- str_c(name, "_", sep = "")
 
-  results_error <- tibble()
-  for (i in 1:length(articles))
-    {
-      cur_artikel <- articles[i]
-      for (j in 1:length(orte))
-        {
-          cur_ort <- orte[j]
-          cur_artikel <- articles[i]
+  col_names <- results %>%
+    select(., starts_with("p_")) %>%
+    colnames() %>%
+    str_replace("p_", name)
 
-          col_names <- results %>%
-            select(., starts_with("p_")) %>%
-            colnames() %>%
-            str_replace("p_", name)
+  forecasts <- results %>%
+    select(-Monat) %>%
+    select(., starts_with("p_"))
 
-          forecasts <- results %>%
-            filter(Artikel == cur_artikel, Ort == cur_ort) %>%
-            select(-Monat, -Artikel, -Ort) %>%
-            select(., starts_with("p_"))
+  actual <- results %>%
+    select(-Monat) %>%
+    select(y)
 
-          actual <- results %>%
-            filter(Artikel == cur_artikel, Ort == cur_ort) %>%
-            select(-Monat, -Artikel, -Ort) %>%
-            select(y)
+  cur_results <- map2(actual, forecasts, func) %>%
+    unlist() %>%
+    as.tibble() %>%
+    mutate(method = col_names) %>%
+    spread(method, value)
 
-          cur_results <- map2(actual, forecasts, func) %>%
-            unlist() %>%
-            as.tibble() %>%
-            mutate(method = col_names) %>%
-            spread(method, value) %>%
-            mutate(Artikel = cur_artikel, Ort = cur_ort)
-
-          results_error <- bind_rows(results_error, cur_results)
-        }
-    }
-  results_error <- results_error %>%
-    gather(key = method, value = value, -Artikel, -Ort) %>%
+  results_error <- cur_results %>%
+    gather(key = method, value = value) %>%
     separate(method, into = c("metric", "method"))
 
   return(results_error)

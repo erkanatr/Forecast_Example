@@ -20,6 +20,7 @@ library(tsoutliers) # identify and replace outliers
 set.seed(10) # set random seed for reproducible results
 
 source("Code/func_forecasts.R")
+source("Code/func_training.R")
 
 # -- load data
 data("AirPassengers")
@@ -46,13 +47,42 @@ df_test <- rowid_to_column(df_data) %>%
   filter(rowid > number_train) %>%
   mutate(dataset = "test")
 
+END_TRAIN <- max(df_train$Monat)
+
 df_data <- bind_rows(df_train, df_test)
 
 ggplot(df_data, aes(x = Monat, y = y, color = dataset)) +
   geom_line() +
   geom_point()
 
-multiple_forecasts(df_train, df_test)
+df_forecasts <- multiple_forecasts(df_train, df_test)
+
+df_forecasts %>%
+  select(-rowid)
+
+df_metrics <- calc_metrics(df_forecasts, "rmse", rmse) %>%
+  arrange(value)
+
+best_method <- df_metrics %>%
+  group_by(metric) %>%
+  summarise(value = min(value)) %>%
+  inner_join(., df_metrics) %>%
+  select(method) %>%
+  pull()
+best_method <- str_c("p_", best_method)
+
+df_forecasts %>%
+  select(Monat, y = !!best_method) %>%
+  mutate(dataset = "forecast") %>%
+  bind_rows(., df_data) %>%
+  select(-rowid) %>%
+  ggplot( aes(x = Monat, y = y, color = dataset)) +
+    geom_line() +
+    geom_point()
+
+
+  
+
 
 
 

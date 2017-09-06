@@ -49,9 +49,9 @@ multiple_forecasts <- function(df_current_train, df_current_test) {
   # -- Create all Forecasts from forecast package
   current_results <- df_current_test %>%
     # -- Holt Winters with additive seasonal component --
-    bind_cols(., create_forecast(df_current_train, df_current_test, "hw", 
-                             list(seasonal = "additive", 
-                             initial = "optimal"))) %>%
+    #bind_cols(., create_forecast(df_current_train, df_current_test, "hw", 
+    #                         list(seasonal = "additive", 
+    #                         initial = "optimal"))) %>%
     # -- Auto.Arima -- 
     bind_cols(., create_forecast(df_current_train, df_current_test, 
                              "auto.arima")) %>%
@@ -66,8 +66,8 @@ multiple_forecasts <- function(df_current_train, df_current_test) {
     bind_cols(., create_forecast(df_current_train, df_current_test, "ets", 
                              list(additive.only = TRUE))) %>%
     # -- Bagged ETS -- 
-    #cbind(., create_forecast(df_current_train, df_current_test, 
-    #                          "baggedETS")) %>%
+    cbind(., create_forecast(df_current_train, df_current_test, 
+                              "baggedETS")) %>%
     # -- xgboost --
     bind_cols(., create_forecast(df_current_train, df_current_test, "xgbar")) %>%
     # -- Neural Network -- 
