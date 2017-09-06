@@ -145,7 +145,7 @@ forecast_ensemble <- function(current_results) {
   mix <- mixture(Y = test_data_ts, experts = experts, model = "OGD", 
                  loss.type = "percentage")
   p_mix <- ts(predict(mix, experts, test_data_ts, type='response'), 
-              start = c(2015, 07), frequency = 29)
+              start = c(2015, 07), frequency = 12)
   
   
   ensemble_result <- as_tibble(p_mix) %>%
