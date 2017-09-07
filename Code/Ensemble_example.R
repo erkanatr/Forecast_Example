@@ -42,11 +42,12 @@ point_forecast <- forecast(model, h = 5)
 
 # setting up an ensemble of support vector machines
 specs2 <-
-  model_specs(learner = c("bm_svr"),
+  model_specs(learner = c("bm_ppr","bm_glm","bm_svr","bm_mars"),
               learner_pars = list(
-                bm_svr = list(kernel = c("vanilladot", "polydot",
-                                         "rbfdot"),
-                              C = c(1,3,6))
+                bm_glm = list(alpha = c(0, .5, 1)),
+                bm_svr = list(kernel = c("rbfdot", "polydot"),
+                              C = c(1,3)),
+                bm_ppr = list(nterms = 4)
               ))
 
 model <- DETS(target ~., train, specs2)
