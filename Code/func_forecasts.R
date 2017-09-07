@@ -66,8 +66,8 @@ multiple_forecasts <- function(df_current_train, df_current_test) {
     bind_cols(., create_forecast(df_current_train, df_current_test, "ets", 
                              list(additive.only = TRUE))) %>%
     # -- Bagged ETS -- 
-    cbind(., create_forecast(df_current_train, df_current_test, 
-                              "baggedETS")) %>%
+    #cbind(., create_forecast(df_current_train, df_current_test, 
+    #                          "baggedETS")) %>%
     # -- xgboost --
     bind_cols(., create_forecast(df_current_train, df_current_test, "xgbar")) %>%
     # -- Neural Network -- 

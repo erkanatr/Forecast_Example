@@ -55,12 +55,33 @@ ggplot(df_data, aes(x = Monat, y = y, color = dataset)) +
   geom_line() +
   geom_point()
 
+
+
 df_forecasts <- multiple_forecasts(df_train, df_test)
 
 df_forecasts %>%
   select(-rowid)
 
-df_metrics <- calc_metrics(df_forecasts, "rmse", rmse) %>%
+experts <- df_forecasts %>%
+  select(., starts_with("p_"), -p_ensemble) %>%
+  as.matrix()
+
+
+test_data_ts <- df_forecasts %>%
+  df_to_ts("y") 
+
+mix <- mixture(Y = test_data_ts, experts = experts, model = "OGD", 
+               loss.type = "percentage")
+p_mix <- ts(predict(mix, experts, type='response', online = FALSE), 
+            start = c(1958, 08), frequency = 29)
+
+
+
+
+ensemble_result <- as_tibble(p_mix) %>%
+  rename(p_ensemble = `Series 1`)
+
+df_metrics <- calc_metrics(df_forecasts, "mae", mae) %>%
   arrange(value)
 
 best_method <- df_metrics %>%
@@ -71,6 +92,8 @@ best_method <- df_metrics %>%
   pull()
 best_method <- str_c("p_", best_method)
 
+
+
 df_forecasts %>%
   select(Monat, y = !!best_method) %>%
   mutate(dataset = "forecast") %>%
@@ -78,7 +101,8 @@ df_forecasts %>%
   select(-rowid) %>%
   ggplot( aes(x = Monat, y = y, color = dataset)) +
     geom_line() +
-    geom_point()
+    geom_point() +
+    ggtitle(str_c("Modell", best_method, sep = " "))
 
 
   
