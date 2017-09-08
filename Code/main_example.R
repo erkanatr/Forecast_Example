@@ -58,6 +58,11 @@ ggplot(df_data, aes(x = Monat, y = y, color = dataset)) +
 
 df_forecasts <- multiple_forecasts(df_train, df_test)
 
+df_forecasts <- mutate(df_forecasts, p_ensemble_naiv = 0.25 * p_hybridModel +
+                            0.25 * p_prophet_lin +
+                            0.25 * p_prophet_log +
+                            0.25 * p_tbats 
+)
 
 df_metrics <- calc_metrics(df_forecasts, "mae", mae) %>%
   arrange(value)
