@@ -85,8 +85,14 @@ df_forecasts %>%
 #-- Test log
 df_train_log <- mutate(df_train, y = log(y))
 
-df_forecasts <- multiple_forecasts(df_train_log, df_test)
+df_forecasts_log <- multiple_forecasts(df_train_log, df_test)
 
+df_forecast_log <- df_forecasts_log %>%
+  mutate_at(exp, .vars = vars(starts_with("p_")))
+
+df_metrics_log <- calc_metrics(df_forecast_log, "mae", mae) %>%
+  arrange(value)
+df_metrics_log
 
 
   
