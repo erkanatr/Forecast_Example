@@ -90,10 +90,16 @@ df_forecasts_log <- multiple_forecasts(df_train_log, df_test)
 df_forecast_log <- df_forecasts_log %>%
   mutate_at(exp, .vars = vars(starts_with("p_")))
 
+df_forecast_log <- mutate(df_forecast_log, p_ensemble_naiv = 0.25 * p_hybridModel +
+                                          0.25 * p_prophet_lin +
+                                          0.25 * p_prophet_log +
+                                          0.25 * p_tbats 
+                        )
+
 df_metrics_log <- calc_metrics(df_forecast_log, "mae", mae) %>%
   arrange(value)
+ 
 df_metrics_log
-
 
   
 
