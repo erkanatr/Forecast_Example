@@ -72,28 +72,29 @@ abs_error <- function(y_hat, y) {
 
 # -- function for calculating rmse
 calc_metrics <- function(results, name, func) {
-  name <- str_c(name, "_", sep = "")
 
-  col_names <- results %>%
-    select(., starts_with("p_")) %>%
-    colnames() %>%
-    str_replace("p_", name)
+        
 
-  forecasts <- results %>%
-    select(-Monat) %>%
-    select(., starts_with("p_"))
+          col_names <- results %>%
+            select(., starts_with("p_")) %>%
+            colnames() %>%
+            str_replace("p_", str_c(name, "_"))
 
-  actual <- results %>%
-    select(-Monat) %>%
-    select(y)
+          forecasts <- results %>%
+            select(-Monat) %>%
+            select(., starts_with("p_"))
 
-  cur_results <- map2(actual, forecasts, func) %>%
-    unlist() %>%
-    as.tibble() %>%
-    mutate(method = col_names) %>%
-    spread(method, value)
+          actual <- results %>%
+            select(-Monat) %>%
+            select(y)
 
-  results_error <- cur_results %>%
+          results_error <- map2(actual, forecasts, func) %>%
+            unlist() %>%
+            as.tibble() %>%
+            mutate(method = col_names) %>%
+            spread(method, value) %>%
+        
+
     gather(key = method, value = value) %>%
     separate(method, into = c("metric", "method"))
 

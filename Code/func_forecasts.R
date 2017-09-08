@@ -83,11 +83,11 @@ multiple_forecasts <- function(df_current_train, df_current_test) {
   
   # -- Die bisherigen Forecasts werden mit Hilfe des Opera Packages in einem
   # -- Modell kombiniert.
-  forecast_ensemble_results <- forecast_ensemble(current_results)
+  #forecast_ensemble_results <- forecast_ensemble(current_results)
   
   # -- Kombiniere die Vorhersagen vom Ensemble mit den Vorhersagen der anderen
   # -- Modelle
-  current_results <- bind_cols(current_results, forecast_ensemble_results)
+  #current_results <- bind_cols(current_results, forecast_ensemble_results)
   
   return(current_results)
 }
