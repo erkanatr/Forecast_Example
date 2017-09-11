@@ -90,7 +90,7 @@ test <- df_data %>%
   select(-Monat, -dataset)
 
 specs <- model_specs(
-  learner = c("bm_ppr","bm_glm","bm_svr","bm_mars", "bm_randomforest"), 
+  learner = c("bm_ppr","bm_glm","bm_svr","bm_mars"), 
   learner_pars = list(
     bm_glm = list(alpha = c(0, .5, 1)),
     bm_svr = list(kernel = c("rbfdot", "polydot"),

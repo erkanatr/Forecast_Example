@@ -17,11 +17,13 @@ library(padr) #detect missing values
 library(imputeTS) # impute missing values
 library(tsoutliers) # identify and replace outliers
 library(xts)
+library(tsensembler)
 
 set.seed(10) # set random seed for reproducible results
 
 source("Code/func_forecasts.R")
 source("Code/func_training.R")
+source("Code/function_tsensemble.R")
 
 # -- load data
 data("AirPassengers")
@@ -56,7 +58,11 @@ ggplot(df_data, aes(x = Monat, y = y, color = dataset)) +
   geom_line() +
   geom_point()
 
-df_forecasts <- multiple_forecasts(df_train, df_test)
+df_forecasts <- multiple_forecasts(df_train, df_test) %>%
+  as_tibble()
+
+df_forecasts <- ml_forecast_ensemble(df_data) %>%
+  bind_cols(., df_forecasts_log)
 
 df_forecasts <- mutate(df_forecasts, p_ensemble_naiv = 0.25 * p_hybridModel +
                             0.25 * p_prophet_lin +
@@ -90,16 +96,23 @@ df_forecasts %>%
 #-- Test log
 df_train_log <- mutate(df_train, y = log(y))
 
-df_forecasts_log <- multiple_forecasts(df_train_log, df_test)
+df_forecasts_log <- multiple_forecasts(df_train_log, df_test) %>%
+  #mutate_at(as.integer, .vars = vars(starts_with("p_"))) %>%
+  as_tibble()
+  
+df_forecasts_log <- ml_forecast_ensemble(df_train_log, df_test) %>%
+  bind_cols(., df_forecasts_log)
+  
 
 df_forecasts_log <- df_forecasts_log %>%
-  mutate_at(exp, .vars = vars(starts_with("p_")))
+  mutate_at(exp, .vars = vars(starts_with("p_"))) %>%
+  as_tibble()
 
-df_forecasts_log <- mutate(df_forecast_log, p_ensemble_naiv = 0.25 * p_hybridModel +
+df_forecasts_log <- mutate(df_forecasts_log, p_ensemble_naiv = 0.25 * p_hybridModel +
                                           0.25 * p_prophet_lin +
                                           0.25 * p_prophet_log +
                                           0.25 * p_tbats 
-                        )
+                        ) 
 
 df_metrics_log <- calc_metrics(df_forecasts_log, "mae", mae) %>%
   arrange(value)
